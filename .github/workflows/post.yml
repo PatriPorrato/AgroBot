@@ -1,0 +1,56 @@
+name: Postear precios agro
+
+on:
+  schedule:
+    - cron: "0 15 * * *"   # 15:00 UTC = 12:00 ART
+    - cron: "0 21 * * *"   # 21:00 UTC = 18:00 ART
+  workflow_dispatch:        # para correrlo manualmente cuando quieras
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      # --- Estado intradía (cache) ---
+      - name: Get UTC date (YYYY-MM-DD)
+        id: date
+        run: echo "today=$(date -u +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Restore .state cache (same day)
+        id: restore-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .state
+          key: agrobot-state-${{ steps.date.outputs.today }}
+
+      # --- Ejecutar bot ---
+      - name: Run bot
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+          UREA_USD_T: ${{ secrets.UREA_USD_T }}
+          INSUMOS_CSV_URL: ${{ secrets.INSUMOS_CSV_URL }}
+        run: |
+          mkdir -p .state
+          python bot.py
+
+      # --- Guardar .state para el cierre ---
+      - name: Save .state cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .state
+          key: agrobot-state-${{ steps.date.outputs.today }}
