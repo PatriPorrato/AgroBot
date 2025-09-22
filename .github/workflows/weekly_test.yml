@@ -1,7 +1,7 @@
 name: Test resumen semanal (forzado)
 
 on:
-  workflow_dispatch:  # lo ejecutás manualmente
+  workflow_dispatch:  # lo ejecutás manualmente desde Actions
 
 jobs:
   run:
@@ -18,8 +18,10 @@ jobs:
       - name: Install deps
         run: pip install -r requirements.txt
 
-      # (Opcional) Siembra un historial de 7 días para probar el resumen SEMANA
-      # Si ya tenés runs de MEDIODIA/CIERRE en la semana, podés omitir esta siembra.
+      # ----- OPCIONAL -----
+      # Si NO tenés todavía historial real en .state/daily.csv,
+      # dejá este bloque para "sembrar" 7 días de datos de ejemplo.
+      # Si ya juntaste datos reales durante la semana, podés borrar este bloque.
       - name: Seed weekly data (test only)
         run: |
           mkdir -p .state
@@ -44,7 +46,6 @@ CSV
           # Opcionales
           UREA_USD_T: ${{ secrets.UREA_USD_T }}
           INSUMOS_CSV_URL: ${{ secrets.INSUMOS_CSV_URL }}
-          # Forzamos el modo SEMANA para esta prueba
+          # Forzamos el modo resumen semanal
           RUN_MODE: SEMANA
-        run: |
-          python bot.py
+        run: python bot.py
