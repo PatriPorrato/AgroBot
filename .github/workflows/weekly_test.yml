@@ -1,4 +1,4 @@
-name: Test resumen semanal (forzado)
+name: Test resumen semanal (simple)
 
 on:
   workflow_dispatch:  # lo ejecutás manualmente desde Actions
@@ -17,23 +17,6 @@ jobs:
 
       - name: Install deps
         run: pip install -r requirements.txt
-
-      # ----- OPCIONAL -----
-      # Si no tenés todavía historial real en .state/daily.csv,
-      # este bloque “siembra” 7 días de ejemplo.
-      - name: Seed weekly data (test only)
-        run: |
-          mkdir -p .state
-          cat > .state/daily.csv << 'CSV'
-date,soja,maiz,trigo
-2025-09-15,268.0,182.0,211.0
-2025-09-16,269.5,181.0,212.0
-2025-09-17,270.0,180.5,210.5
-2025-09-18,271.0,179.0,211.5
-2025-09-19,272.0,179.5,212.0
-2025-09-20,271.5,178.5,211.0
-2025-09-21,272.5,179.0,212.5
-CSV
 
       - name: Run bot (SEMANA)
         env:
