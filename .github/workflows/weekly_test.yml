@@ -19,9 +19,8 @@ jobs:
         run: pip install -r requirements.txt
 
       # ----- OPCIONAL -----
-      # Si NO tenés todavía historial real en .state/daily.csv,
-      # dejá este bloque para "sembrar" 7 días de datos de ejemplo.
-      # Si ya juntaste datos reales durante la semana, podés borrar este bloque.
+      # Si no tenés todavía historial real en .state/daily.csv,
+      # este bloque “siembra” 7 días de ejemplo.
       - name: Seed weekly data (test only)
         run: |
           mkdir -p .state
@@ -38,14 +37,11 @@ CSV
 
       - name: Run bot (SEMANA)
         env:
-          # Claves de X
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
-          # Opcionales
           UREA_USD_T: ${{ secrets.UREA_USD_T }}
           INSUMOS_CSV_URL: ${{ secrets.INSUMOS_CSV_URL }}
-          # Forzamos el modo resumen semanal
           RUN_MODE: SEMANA
         run: python bot.py
