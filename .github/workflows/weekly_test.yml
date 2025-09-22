@@ -1,0 +1,46 @@
+name: Test resumen semanal (forzado)
+
+on:
+  workflow_dispatch:  # lo ejecutás manualmente
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      # (Opcional) Siembra un historial de 7 días para probar el resumen SEMANA
+      # Si ya tenés runs reales en la semana, podés borrar este bloque.
+      - name: Seed weekly data (test only)
+        run: |
+          mkdir -p .state
+          cat > .state/daily.csv << 'CSV'
+date,soja,maiz,trigo
+2025-09-15,268.0,182.0,211.0
+2025-09-16,269.5,181.0,212.0
+2025-09-17,270.0,180.5,210.5
+2025-09-18,271.0,179.0,211.5
+2025-09-19,272.0,179.5,212.0
+2025-09-20,271.5,178.5,211.0
+2025-09-21,272.5,179.0,212.5
+CSV
+
+      - name: Run bot (SEMANA)
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+          UREA_USD_T: ${{ secrets.UREA_USD_T }}
+          INSUMOS_CSV_URL: ${{ secrets.INSUMOS_CSV_URL }}
+          RUN_MODE: SEMANA
+        run: python bot.py
